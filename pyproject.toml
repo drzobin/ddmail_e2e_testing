@@ -14,6 +14,7 @@ classifiers = [
 dependencies = [
   "pytest",
   "toml",
+  "requests",
 ]
 license = "AGPL-3.0"
 license-files = ["LICEN[CS]E*"]
@@ -22,6 +23,7 @@ license-files = ["LICEN[CS]E*"]
 dev = [
   "pytest",
   "toml",
+  "requests",
   "flake8",
   "hatchling",
   "twine",
@@ -29,6 +31,7 @@ dev = [
 test = [
   "pytest",
   "toml",
+  "requests",
   "flake8",
 ]
 
