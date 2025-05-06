@@ -32,7 +32,7 @@ def test_register(toml_config):
 
     response = s.post(login_url, data=data, files=files, timeout=2)
 
-    #
+    # Check if login workes with the newly registered/created account/user/password and key.
     if response.status_code == 200 and "Logged in as user: " + auth_data["username"] in str(response.content):
         print("working")
         return "working"
