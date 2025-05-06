@@ -1,7 +1,7 @@
-url = "https://www.ddmail.se"
+URL = "https://www.ddmail.se"
 
-[ACTIVATED_ACCOUNT]
-account = "change_me"
-username = "change_me"
-password = "change_me"
-key_file_path = "change_me"
+[TEST_ACCOUNT]
+ACCOUNT = "change_me"
+USERNAME = "change_me"
+PASSWORD = "change_me"
+KEY_FILE_PATH = "change_me"
