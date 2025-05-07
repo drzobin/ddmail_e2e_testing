@@ -40,17 +40,17 @@ def login(toml_config):
     password = toml_config["TEST_ACCOUNT"]["PASSWORD"]
 
     # Set key file data used for login.
-    file = open('toml_config["TEST_ACCOUNT"]["KEY_FILE_PATH"]', "r")
+    file = open(toml_config["TEST_ACCOUNT"]["KEY_FILE_PATH"], "r")
     key = file.read()
     file.close()
     
     # Get /login csrf token.
     response = s.get(login_url, timeout=1)
-    csrf_token = helpers.get_csrf_token(response.content)
+    csrf_token = get_csrf_token(response.content)
 
     # Create post request for login.
     data={'csrf_token': csrf_token, 'user': user, 'password': password}
-    file_content = auth_data["key"].encode('utf-8')
+    file_content = key.encode('utf-8')
     files = {"key": ("key.txt", file_content)}
 
     # Login with account from config file.
