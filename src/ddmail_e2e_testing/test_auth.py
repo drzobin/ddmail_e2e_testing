@@ -1,6 +1,5 @@
 import time
 import toml
-import pytest
 import requests
 import ddmail_e2e_testing.helpers as helpers
 
@@ -39,3 +38,38 @@ def test_register(toml_config):
     else:
         print("fail")
         return "fail"
+
+def test_login_logout(toml_config):
+    print("Testing /login")
+    main_url = toml_config["URL"] 
+    logout_url = toml_config["URL"] + "/logout"
+
+    s = helpers.login(toml_config)
+    response = s.get(main_url, timeout=1)
+
+    # Check if login worked and returned status code 200.
+    if response.status_code != 200:
+        print("fail")
+        return "fail"
+    
+    # Check if login worked.
+    if "Logged in as user: " + toml_config["TEST_ACCOUNT"]["USERNAME"] not in str(response.content):
+        print("fail")
+        return "fail"
+
+    # Logout.
+    response = s.get(logout_url, timeout=1)
+    
+    # Check if logout worked and returned status code 200.
+    if response.status_code != 200:
+        print("fail")
+        return "fail"
+    
+    # Check if logout worked.
+    if "Logged in as user: Not logged in" in str(response.content):
+        print("working")
+        return "working"
+    else:
+        print("fail")
+        return "fail"
+
