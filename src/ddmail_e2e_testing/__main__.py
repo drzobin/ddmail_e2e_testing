@@ -2,7 +2,7 @@ import sys
 import os
 import argparse
 import toml
-from ddmail_e2e_testing.test_auth import test_register
+from ddmail_e2e_testing.test_auth import test_register, test_login_logout
 
 def main():
     # Get arguments from args.
@@ -19,8 +19,11 @@ def main():
     with open(args.config_file, 'r') as f:
         toml_config = toml.load(f)
 
-    # Testing register, login and logout
+    # Testing register.
     test_register(toml_config)
+
+    # Test login and logout.
+    test_login_logout(toml_config)
 
 if __name__ == "__main__":
     main()
