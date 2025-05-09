@@ -2,9 +2,12 @@ import sys
 import os
 import argparse
 import logging
+import logging.handlers
+import secrets
+import string
 import toml
 from ddmail_e2e_testing.test_auth import test_register, test_login_logout
-from ddmail_e2e_testing.test_email import test_add_email
+from ddmail_e2e_testing.test_email import test_add_email, test_change_password_on_email, test_remove_email
 
 def main():
     # Get arguments from args.
@@ -23,10 +26,6 @@ def main():
 
     # Setup logging.
     logger = logging.getLogger(__name__)
-    console_handler = logging.StreamHandler()
-    file_handler = logging.FileHandler("app.log", mode="a", encoding="utf-8")
-    logger.addHandler(console_handler)
-    logger.addHandler(file_handler)
 
     formatter = logging.Formatter(
         "{asctime} {levelname} in {module} {funcName} {lineno}: {message}",
@@ -34,22 +33,89 @@ def main():
         datefmt="%Y-%m-%d %H:%M",
         )
 
-    console_handler.setFormatter(formatter)
-    file_handler.setFormatter(formatter)
+    if toml_config["LOGGING"]["LOG_TO_CONSOLE"] == True:
+        console_handler = logging.StreamHandler()
+        console_handler.setFormatter(formatter)
+        logger.addHandler(console_handler)
+        
+    if toml_config["LOGGING"]["LOG_TO_FILE"] == True:
+        file_handler = logging.FileHandler(toml_config["LOGGING"]["LOGFILE"], mode="a", encoding="utf-8")
+        file_handler.setFormatter(formatter)
+        logger.addHandler(file_handler)
+        
+    if toml_config["LOGGING"]["LOG_TO_SYSLOG"] == True:
+        syslog_handler = logging.handlers.SysLogHandler(address = toml_config["LOGGING"]["SYSLOG_SERVER"])
+        syslog_handler.setFormatter(formatter)
+        logger.addHandler(syslog_handler)
 
-    logger.setLevel(logging.DEBUG)
+    # Set loglevel.
+    if toml_config["LOGGING"]["LOGLEVEL"] == "DEBUG":
+        logger.setLevel(logging.DEBUG)
+    elif toml_config["LOGGING"]["LOGLEVEL"] == "INFO":
+        logger.setLevel(logging.INFO)
+    elif toml_config["LOGGING"]["LOGLEVEL"] == "WARNING":
+        logger.setLevel(logging.WARNING)
+    elif toml_config["LOGGING"]["LOGLEVEL"] == "ERROR":
+        logger.setLevel(logging.ERROR)
 
+    #
+    #
     # Testing register.
     logger.info("Running test_register")
-    test_register(toml_config,logger)
+    data = test_register(toml_config,logger)
+    if data["is_working"] == True:
+        logger.info(data["msg"])
+    else:
+        logger.error(data["msg"])
 
+    #
+    #
     # Test login and logout.
     logger.info("Running test_login_logout")
-    test_login_logout(toml_config,logger)
+    data = test_login_logout(toml_config,logger)
+    if data["is_working"] == True:
+        logger.info(data["msg"])
+    else:
+        logger.error(data["msg"])
 
-    # Test to add an email account
+    #
+    #
+    # Test to add an email account.
     logger.info("Running test_add_email")
-    test_add_email(toml_config,logger)
+
+    # Create email and set domain
+    email = ''.join(secrets.choice(string.ascii_lowercase ) for _ in range(8))
+    domain = "ddmail.se"
+    password = None
+
+    data = test_add_email(toml_config,logger,email,domain)
+    if data["is_working"] == True:
+        logger.info(data["msg"])
+        password = data["data"]["password"]
+    else:
+        logger.error(data["msg"])
+
+    #
+    #
+    # Test to change password on email account.
+    logger.info("Running test_change_password_on_email")
+
+    data = test_change_password_on_email(toml_config,logger,email,domain,password)
+    if data["is_working"] == True:
+        logger.info(data["msg"])
+    else:
+        logger.error(data["msg"])
+
+    #
+    #
+    # Test to remove email account.
+    logger.info("Running test_remove_email")
+
+    data = test_remove_email(toml_config,logger,email,domain)
+    if data["is_working"] == True:
+        logger.info(data["msg"])
+    else:
+        logger.error(data["msg"])
 
 if __name__ == "__main__":
     main()
