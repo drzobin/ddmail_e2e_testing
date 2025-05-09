@@ -14,9 +14,10 @@ def test_register(toml_config, logger):
     # Check that we get status code 200.
     if response.status_code != 200:
         msg = "GET " + register_url + " did not returned status code 200"
+        return_data = {"is_working": False, "msg": msg, "data": None}
         logger.error(msg)
 
-        return msg
+        return return_data
 
     # Parse the csrf token from html content.
     csrf_token = helpers.get_csrf_token(response.content)
@@ -42,51 +43,58 @@ def test_register(toml_config, logger):
     # Check if POST /login returns status code 200.
     if response.status_code != 200:
         msg = "POST " + login_url + " did not returned status code 200"
+        return_data = {"is_working": False, "msg": msg, "data": None}
         logger.error(msg)
 
-        return msg
+        return return_data
 
     # Check that POST /login
     if "Logged in as user: " + auth_data["username"] not in str(response.content):
         msg = "POST " + login_url + " did not returned correct content"
+        return_data = {"is_working": False, "msg": msg, "data": None}
         logger.error(msg)
 
-        return msg
+        return return_data
 
     # All is working.
-    logger.info("working")
-    return "working"
+    msg = "working"
+    return_data = {"is_working": True, "msg": msg, "data": None}
+
+    return return_data
 
 
 def test_login_logout(toml_config, logger):
-    print("Testing /login and /logout")
     main_url = toml_config["URL"] 
     logout_url = toml_config["URL"] + "/logout"
 
-    s = helpers.login(toml_config)
+    login_data = helpers.login(toml_config)
     
     # Check that login worked.
-    if s == None:
-        msg = "login failed"
+    if login_data["is_working"] == False:
+        return_data = {"is_working": False, "msg": login_data["msg"], "data": None}
         logger.error(msg)
 
-        return msg
-
+        return return_data
+    
+    # Set requests session from login_data
+    s = login_data["data"]["requests_session"]
     response = s.get(main_url, timeout=1)
 
     # Check if login worked and returned status code 200.
     if response.status_code != 200:
         msg = "GET " + main_url + " did not returned status code 200"
+        return_data = {"is_working": False, "msg": msg, "data": None}
         logger.error(msg)
 
-        return msg
+        return return_data
     
     # Check if login worked.
     if "Logged in as user: " + toml_config["TEST_ACCOUNT"]["USERNAME"] not in str(response.content):
         msg = "GET " + main_url + " did not returned correct content"
+        return_data = {"is_working": False, "msg": msg, "data": None}
         logger.error(msg)
 
-        return msg
+        return return_data
 
     # Logout.
     response = s.get(logout_url, timeout=1)
@@ -94,17 +102,22 @@ def test_login_logout(toml_config, logger):
     # Check if logout worked and returned status code 200.
     if response.status_code != 200:
         msg = "GET " + logout_url + " did not returned status code 200"
+        return_data = {"is_working": False, "msg": msg, "data": None}
         logger.error(msg)
 
-        return msg
+        return return_data
     
     # Check if logout worked.
     if "Logged in as user: Not logged in" not in str(response.content):
         msg = "fail: GET " + logout_url + " did not returned correct content"
+        return_data = {"is_working": False, "msg": msg, "data": None}
         logger.error(msg)
 
-        return msg
+        return return_data
 
-    logger.info("working")
-    return "working"
+    # All is working.
+    msg = "working"
+    return_data = {"is_working": True, "msg": msg, "data": None}
+
+    return return_data
 
