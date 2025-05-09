@@ -28,6 +28,14 @@ def get_register_data(data):
 
     return register_data
 
+def get_email_password(data):
+    email_password = None
+    
+    m = re.search(b'with password: (.*)</p>', data)
+    email_password = m.group(1).decode("utf-8")
+
+    return email_password
+
 def login(toml_config):
     # Use requests session to get auth cookie to follow along our requests.
     s = requests.Session()
@@ -50,9 +58,9 @@ def login(toml_config):
     # Check if GET /login returned status code 200.
     if response.status_code != 200:
         msg = "fail: GET " + login_url + " did not returned status code 200"
-        print(msg)
+        return_data = {"is_working": False, "msg": msg, "data": None}
 
-        return None
+        return return_data
 
     csrf_token = get_csrf_token(response.content)
 
@@ -67,9 +75,12 @@ def login(toml_config):
     # Check if POST /login returned status code 200.
     if response.status_code != 200:
         msg = "fail: POST " + login_url + " did not returned status code 200"
-        print(msg)
+        return_data = {"is_working": False, "msg": msg, "data": None}
 
-        return None
+        return return_data
 
-    # Return session with auth cookie set.
-    return s
+    # All is working.
+    msg = "working"
+    return_data = {"is_working": True, "msg": msg, "data": {"requests_session": s}}
+
+    return return_data
