@@ -8,6 +8,7 @@ import string
 import toml
 from ddmail_e2e_testing.test_auth import test_register, test_login_logout
 from ddmail_e2e_testing.test_email import test_add_email, test_change_password_on_email, test_remove_email
+from ddmail_e2e_testing.test_openpgp import test_upload_openpgp_public_key
 
 def main():
     # Get arguments from args.
@@ -112,6 +113,17 @@ def main():
     logger.info("Running test_remove_email")
 
     data = test_remove_email(toml_config,logger,email,domain)
+    if data["is_working"] == True:
+        logger.info(data["msg"])
+    else:
+        logger.error(data["msg"])
+
+    #
+    #
+    # Test to upload openpgp public key.
+    logger.info("Running test_upload_openpgp_public_key")
+
+    data = test_upload_openpgp_public_key(toml_config,logger)
     if data["is_working"] == True:
         logger.info(data["msg"])
     else:
