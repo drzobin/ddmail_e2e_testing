@@ -12,14 +12,14 @@ def test_add_email(toml_config,logger,email,domain):
     # Check that login worked.
     if login_data["is_working"] == False:
         return_data = {"is_working": False, "msg": login_data["msg"], "data": None}
-        logger.error(msg)
+        logger.error(login_data["msg"])
 
         return return_data
     
     # Set requests session from login_data
     s = login_data["data"]["requests_session"]
 
-    response = s.get(add_email_url, timeout=1)
+    response = s.get(add_email_url, timeout=2)
 
     # Check if get add_email worked and returned status code 200.
     if response.status_code != 200:
@@ -86,14 +86,14 @@ def test_change_password_on_email(toml_config,logger,email,domain,password):
     # Check that login worked.
     if login_data["is_working"] == False:
         return_data = {"is_working": False, "msg": login_data["msg"], "data": None}
-        logger.error(msg)
+        logger.error(login_data["msg"])
 
         return return_data
     
     # Set requests session from login_data
     s = login_data["data"]["requests_session"]
 
-    response = s.get(change_password_on_email_url, timeout=1)
+    response = s.get(change_password_on_email_url, timeout=2)
 
     # Check if get change_password_on_email_url worked and returned status code 200.
     if response.status_code != 200:
@@ -157,14 +157,14 @@ def test_remove_email(toml_config,logger,email,domain):
     # Check that login worked.
     if login_data["is_working"] == False:
         return_data = {"is_working": False, "msg": login_data["msg"], "data": None}
-        logger.error(msg)
+        logger.error(login_data["msg"])
 
         return return_data
     
     # Set requests session from login_data
     s = login_data["data"]["requests_session"]
 
-    response = s.get(remove_email_url, timeout=1)
+    response = s.get(remove_email_url, timeout=2)
 
     # Check if get remove_email_url worked and returned status code 200.
     if response.status_code != 200:
