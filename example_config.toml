@@ -1,5 +1,10 @@
+# URL to ddmail applikation that should be test.
 URL = "https://www.ddmail.se"
 
+# Sleep time between test, this is to prevent dos protection to block us.
+SLEEP_TIME = 120
+
+# This account is used to preforme the test, it needs to be activated.
 [TEST_ACCOUNT]
 ACCOUNT = "change_me"
 USERNAME = "change_me"
