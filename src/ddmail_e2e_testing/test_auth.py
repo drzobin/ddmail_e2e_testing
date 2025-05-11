@@ -9,7 +9,7 @@ def test_register(toml_config, logger):
 
     # Get /register csrf token.
     register_url = toml_config["URL"] + "/register"
-    response = s.get(register_url, timeout=1)
+    response = s.get(register_url, timeout=2)
 
     # Check that we get status code 200.
     if response.status_code != 200:
@@ -23,14 +23,14 @@ def test_register(toml_config, logger):
     csrf_token = helpers.get_csrf_token(response.content)
 
     # Register new account and user.
-    response = s.post(register_url, data={'csrf_token': csrf_token},timeout=1)
+    response = s.post(register_url, data={'csrf_token': csrf_token},timeout=2)
 
     # Get authentication data for the newly registers account and user.
     auth_data = helpers.get_register_data(response.content)
     
     # Get /login csrf token.
     login_url = toml_config["URL"] + "/login"
-    response = s.get(login_url, timeout=1)
+    response = s.get(login_url, timeout=2)
     csrf_token = helpers.get_csrf_token(response.content)
 
     # Login with new account.
@@ -72,13 +72,13 @@ def test_login_logout(toml_config, logger):
     # Check that login worked.
     if login_data["is_working"] == False:
         return_data = {"is_working": False, "msg": login_data["msg"], "data": None}
-        logger.error(msg)
+        logger.error(login_data["msg"])
 
         return return_data
     
     # Set requests session from login_data
     s = login_data["data"]["requests_session"]
-    response = s.get(main_url, timeout=1)
+    response = s.get(main_url, timeout=2)
 
     # Check if login worked and returned status code 200.
     if response.status_code != 200:
@@ -97,7 +97,7 @@ def test_login_logout(toml_config, logger):
         return return_data
 
     # Logout.
-    response = s.get(logout_url, timeout=1)
+    response = s.get(logout_url, timeout=2)
     
     # Check if logout worked and returned status code 200.
     if response.status_code != 200:
