@@ -53,7 +53,7 @@ def login(toml_config):
     file.close()
     
     # Get /login csrf token.
-    response = s.get(login_url, timeout=1)
+    response = s.get(login_url, timeout=2)
 
     # Check if GET /login returned status code 200.
     if response.status_code != 200:
