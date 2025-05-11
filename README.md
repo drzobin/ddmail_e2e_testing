@@ -32,7 +32,7 @@ Step 5: Install package<br>
 `pip install dist/[package name].whl`<br>
 
 ## Running
-`source [ddmail_e2e_testing virtual environment path]/bin/activate`
+`source [ddmail_e2e_testing virtual environment path]/bin/activate`<br>
 `ddmail_e2e_testing --config-file [config file]`
 
 ## Coding
