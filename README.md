@@ -4,9 +4,6 @@ End-to-end testing for the DDMail project.
 ## What is DDMail
 DDMail is a e-mail system/service that prioritizes security. A current production example can be found at www.ddmail.se
 
-## Running
-`ddmail_e2e_testing --config-file [config file]`
-
 ## Operating system
 Developt for and tested on debian 12.
 
@@ -35,6 +32,7 @@ Step 5: Install package<br>
 `pip install dist/[package name].whl`<br>
 
 ## Running
+`source [ddmail_e2e_testing virtual environment path]/bin/activate`
 `ddmail_e2e_testing --config-file [config file]`
 
 ## Coding
