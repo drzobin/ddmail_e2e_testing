@@ -12,14 +12,14 @@ def test_upload_openpgp_public_key(toml_config,logger):
     # Check that login worked.
     if login_data["is_working"] == False:
         return_data = {"is_working": False, "msg": login_data["msg"], "data": None}
-        logger.error(msg)
+        logger.error(login_data["msg"])
 
         return return_data
     
     # Set requests session from login_data
     s = login_data["data"]["requests_session"]
 
-    response = s.get(upload_url, timeout=1)
+    response = s.get(upload_url, timeout=2)
 
     # Check if get add_email worked and returned status code 200.
     if response.status_code != 200:
@@ -82,5 +82,78 @@ def test_upload_openpgp_public_key(toml_config,logger):
 
     msg = "working"
     return_data = {"is_working": True, "msg": msg, "data": {"key_fingerprint":key.fingerprint}}
+
+    return return_data
+
+def test_remove_openpgp_public_key(toml_config,logger,key_fingerprint):
+    remove_url = toml_config["URL"] + "/settings/remove_openpgp_public_key"
+
+    # Login.
+    login_data = helpers.login(toml_config)
+    
+    # Check that login worked.
+    if login_data["is_working"] == False:
+        return_data = {"is_working": False, "msg": login_data["msg"], "data": None}
+        logger.error(login_data["msg"])
+
+        return return_data
+    
+    # Set requests session from login_data
+    s = login_data["data"]["requests_session"]
+
+    response = s.get(remove_url, timeout=2)
+
+    # Check if get remove_url worked and returned status code 200.
+    if response.status_code != 200:
+        msg = "GET " + remove_url + " did not returned status code 200"
+        return_data = {"is_working": False, "msg": msg, "data": None}
+        logger.error(msg)
+
+        return return_data
+    
+    # check that login worked.
+    if "Logged in as user: " + toml_config["TEST_ACCOUNT"]["USERNAME"] not in str(response.content):
+        msg = "GET " + remove_url + " login failed"
+        return_data = {"is_working": False, "msg": msg, "data": None}
+        logger.error(msg)
+
+        return return_data
+
+    # Check that content is correct.
+    if "<h3>Remove Openpgp public key</h3>" not in str(response.content):
+        msg = "GET " + remove_url + " did not returned correct content"
+        return_data = {"is_working": False, "msg": msg, "data": None}
+        logger.error(msg)
+        print(str(response.content))
+
+        return return_data
+
+    # Get csrf token.
+    csrf_token = helpers.get_csrf_token(response.content)
+
+    # Remove openpgp public key.
+    data={'csrf_token': csrf_token, 'fingerprint': key_fingerprint}
+    response = s.post(remove_url, data=data, timeout=2)
+
+
+    # Check if post remove_url worked and returned status code 200.
+    if response.status_code != 200:
+        msg = "POST " + remove_url + " did not returned status code 200"
+        return_data = {"is_working": False, "msg": msg, "data": None}
+        logger.error(msg)
+
+        return return_data
+
+    # Check that remove_url return correct content.
+    if "Succesfully removed OpenPGP public key." not in str(response.content):
+        msg = "POST " + remove_url + " did not returned correct content"
+        return_data = {"is_working": False, "msg": msg, "data": None}
+        logger.error(msg)
+        print(response.content)
+
+        return return_data
+
+    msg = "working"
+    return_data = {"is_working": True, "msg": msg, "data": None}
 
     return return_data
