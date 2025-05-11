@@ -5,10 +5,11 @@ import logging
 import logging.handlers
 import secrets
 import string
+import time
 import toml
 from ddmail_e2e_testing.test_auth import test_register, test_login_logout
 from ddmail_e2e_testing.test_email import test_add_email, test_change_password_on_email, test_remove_email
-from ddmail_e2e_testing.test_openpgp import test_upload_openpgp_public_key
+from ddmail_e2e_testing.test_openpgp import test_upload_openpgp_public_key, test_remove_openpgp_public_key
 
 def main():
     # Get arguments from args.
@@ -59,6 +60,10 @@ def main():
     elif toml_config["LOGGING"]["LOGLEVEL"] == "ERROR":
         logger.setLevel(logging.ERROR)
 
+    # Slepp time between tests, this is to prevent dos protection to block us.
+    sleep_time = toml_config["SLEEP_TIME"]
+
+
     #
     #
     # Testing register.
@@ -68,10 +73,12 @@ def main():
         logger.info(data["msg"])
     else:
         logger.error(data["msg"])
+    
 
     #
     #
     # Test login and logout.
+    time.sleep(sleep_time)
     logger.info("Running test_login_logout")
     data = test_login_logout(toml_config,logger)
     if data["is_working"] == True:
@@ -82,6 +89,7 @@ def main():
     #
     #
     # Test to add an email account.
+    time.sleep(sleep_time)
     logger.info("Running test_add_email")
 
     # Create email and set domain
@@ -99,6 +107,7 @@ def main():
     #
     #
     # Test to change password on email account.
+    time.sleep(sleep_time)
     logger.info("Running test_change_password_on_email")
 
     data = test_change_password_on_email(toml_config,logger,email,domain,password)
@@ -110,6 +119,7 @@ def main():
     #
     #
     # Test to remove email account.
+    time.sleep(sleep_time)
     logger.info("Running test_remove_email")
 
     data = test_remove_email(toml_config,logger,email,domain)
@@ -121,6 +131,7 @@ def main():
     #
     #
     # Test to upload openpgp public key.
+    time.sleep(sleep_time)
     logger.info("Running test_upload_openpgp_public_key")
 
     data = test_upload_openpgp_public_key(toml_config,logger)
@@ -128,6 +139,20 @@ def main():
         logger.info(data["msg"])
     else:
         logger.error(data["msg"])
+
+    #
+    #
+    # Test to remove openpgp public key.
+    time.sleep(sleep_time)
+    if data["is_working"] == True:
+        logger.info("Running test_remove_openpgp_public_key")
+        key_fingerprint = data["data"]["key_fingerprint"]
+
+        data = test_remove_openpgp_public_key(toml_config,logger,key_fingerprint)
+        if data["is_working"] == True:
+            logger.info(data["msg"])
+        else:
+            logger.error(data["msg"])
 
 if __name__ == "__main__":
     main()
